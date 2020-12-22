@@ -1,0 +1,51 @@
+
+.wrapper {
+  padding: 1%;
+  box-sizing: border-box;
+}
+.switch {
+  appearance: none;
+  background-color: #fff;
+  border: 1px solid #999;
+  border-radius: 15px;
+  height: 25px;
+  overflow: hidden;
+  position: relative;
+  width: 45px;
+  box-sizing: border-box;
+}
+.switch::after {
+  background-color: #fff;
+  border: 1px solid #999;
+  border-radius: 50%;
+  box-shadow: 2px 0 rgba(0, 0, 0, 0.2);
+  content: "";
+  display: block;
+  height: 25px;
+  left: -1px;
+  position: absolute;
+  top: -1px;
+  transition: 0.3s all;
+  width: 25px;
+  box-sizing: border-box;
+}
+.switch::before {
+  background-color: limegreen;
+  content: "";
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  transition: 0.3s all;
+  width: 0;
+  box-sizing: border-box;
+}
+.switch.js-active::after {
+  box-shadow: none;
+  left: 20px;
+  box-sizing: border-box;
+}
+.switch.js-active::before {
+  width: 100%;
+  box-sizing: border-box;
+}

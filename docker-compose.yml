@@ -1,0 +1,48 @@
+version: "3"
+
+services:
+  db:
+    build: ./mariadb/
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mariadb/sql:/docker-entrypoint-initdb.d
+      - test_db:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_DATABASE=hoge_db
+      - MYSQL_USER=hoge_user
+      - MYSQL_PASSWORD=hoge_pass_db
+
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - "./src:/src"
+    tty: true
+    environment:
+      TZ: Asia/Tokyo
+      FLASK_APP: app.py
+      FLASK_ENV: development
+    command: flask run -h 0.0.0.0
+    restart: always
+
+  phpmyadmin:
+    image: phpmyadmin
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=db
+      - PMA_USER=hoge_user
+      - PMA_PASSWORD=hoge_pass_db
+    links:
+      - db
+    ports:
+      - 8080:80
+    volumes:
+      - ./phpmyadmin/sessions:/sessions
+
+volumes:
+  test_db:
+    driver: local
