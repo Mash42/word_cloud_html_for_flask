@@ -2,3 +2,6 @@ Jinja2==2.11.2
 Flask==1.1.2
 requests==2.25.0
 PyMySQL==0.10.1
+mecab-python3==0.996.2
+wordcloud
+matplotlib

@@ -29,7 +29,11 @@
                 $(".word-cloud-text").on("mouseout", function(){
                     $(this).removeClass("cursor-pointer");
                 })
+                
             });
+            function alertName(e) {
+                alert("クリックされました");
+            }
         </script>
         <style>
             .cursor-pointer {
@@ -41,13 +45,37 @@
     <body>
         <div class="container mt-1" id="app">
             <div class="row">
-                <div class="col-12 text-center">
-                    <h1>ワードクラウド for d3.js</h1>
-                    <div id="wordcloud" class="w-100"></div>
+                <div class="col-6">
+                    <form action="/create_word_cloud" method="POST" name="create_word_cloud_form" id="create_word_cloud_form_id">
+                        <div class="form-group">
+                            <label for="input_sentence_id">文章</label>
+                            <textarea name="input_sentence" id="input_sentence_id" rows="10"
+                                      class="form-control" required>{{input_sentence}}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">ワードクラウド作成</button>
+                    </form>
+                </div>
+                <div class="col-6 text-center">
+                    <label for="wordcloud">ワードクラウド</label>
+                    <div id="wordcloud" class="w-100 h-100 border border-primary"></div>
+                </div>
+                
+                <div class="col-12 w-100 h-100">
+                    <object type="image/svg+xml" data="/static/word_cloud/word_cloud.svg" class="wordcloud-object" onload="svgLoading()" id="wordcloud-id"></object>
                 </div>
             </div>
         </div>
         <script>
+            function svgLoading(){
+                var svgDoc = document.getElementById('wordcloud-id').getSVGDocument();
+                var text_tags = svgDoc.getElementsByTagName("text");
+                for(text of text_tags){
+                    text.addEventListener("click", function(e){
+                        alert(this.innerHTML);
+                    })
+                }
+            }
+            {% if word_list %}
             // ワードリスト
             var myWords = []
             {% for word_info in word_list %}
@@ -97,6 +125,7 @@
                         )
                         .text(function (d) { return d.text; });
                 }
+                {% endif %}
         </script>
     </body>
 </html>
