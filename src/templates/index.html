@@ -36,6 +36,15 @@
                 })
                 
             });
+            function svgLoading(obj){
+                var svgDoc = obj.getSVGDocument();
+                var text_tags = svgDoc.getElementsByTagName("text");
+                for(text of text_tags){
+                    text.addEventListener("click", function(e){
+                        alert(this.innerHTML);
+                    })
+                }
+            }
         </script>
         <style>
             .cursor-pointer {
@@ -45,13 +54,6 @@
         <title>ワードクラウド</title>
     </head>
     <body>
-    {% if file_name %}
-    <h1>{{file_name}}</h1>
-    {% endif %}
-    
-    {% if wordcloud_width %}
-    <h1>{{wordcloud_width}}</h1>
-    {% endif %}
         <div class="container mt-1" id="app">
             <div class="row">
                 <div class="col-6">
@@ -70,28 +72,16 @@
                 </div>
                 <div class="col-6 text-center">
                     <label for="wordcloud">ワードクラウド</label>
-                    <div id="wordcloud" class="w-100 h-100 border border-primary">
+                    <div id="wordcloud" class="w-100 h-100">
                         <object type="image/svg+xml"
-                                data="/static/wordcloud/wordcloud.svg" 
+                                data="/static/wordcloud/wordcloud.svg?{{new_time}}" 
                                 class="wordcloud-object"
                                 onload="svgLoading(this);"
-                                loading="eager"
                                 id="wordcloud-id">
-                        </object>
+                        </object>                   
                     </div>
                 </div>
             </div>
         </div>
-        <script>
-            function svgLoading(obj){
-                var svgDoc = obj.getSVGDocument();
-                var text_tags = svgDoc.getElementsByTagName("text");
-                for(text of text_tags){
-                    text.addEventListener("click", function(e){
-                        alert(this.innerHTML);
-                    })
-                }
-            }
-        </script>
     </body>
 </html>

@@ -7,12 +7,14 @@ import MeCab
 import collections
 import random
 import os
+import datetime
 #ワードクラウド
 from wordcloud import WordCloud, ImageColorGenerator
 #fpath = "C:\Windows\Fonts\meiryob.ttc" # fontは任意で
 app = Flask(__name__)
 app.secret_key = os.urandom(16)
 
+WORDCLOUD_FONT_PATH = "/src/static/wordcloud/font/Noto-hinted/NotoSansCJKjp-Regular.otf"
 # データベースコネクション情報
 MYSQL_OPTIONS = {"host": 'db'
                 ,"port": 3306
@@ -30,35 +32,44 @@ color_list = ["#A4CABC"
 # ホーム
 @app.route('/', methods=["GET", "POST"])
 def index():
-    return render_template("index.html")
+    new_time = datetime.datetime.now().strftime('%H:%M:%S')
+    return render_template("index.html"
+                          ,new_time=new_time)
 
 # ホーム
 @app.route('/create_wordcloud', methods=["GET", "POST"])
 def create_wordcloud():
+    new_time = datetime.datetime.now().strftime('%H:%M:%S')
     file_name = ""
     input_sentence = ""
+    wordcloud_width = None
     if request.method == "POST":
         input_sentence = request.form["input_sentence"]
         wordcloud_width = request.form["wordcloud_width"]
         words = get_words_for_mecab(input_sentence)
         # ファイル作成
-        file_name = create_wordcrowd(" ".join(words), int(wordcloud_width), int(wordcloud_width)//2)
+        file_name = create_wordcrowd(" ".join(words)
+                                    ,int(wordcloud_width)
+                                    ,int(wordcloud_width)//2
+                                    ,WORDCLOUD_FONT_PATH)
 
     return render_template("index.html"
                           ,input_sentence=input_sentence
                           ,file_name=file_name
                           ,wordcloud_width=wordcloud_width
+                          ,new_time=new_time
                           )
 
-def create_wordcrowd(text, width, height):
-    wordcloud = WordCloud(background_color="white",
-                          width=width,  #800だった
-                          height=height,#600だった
-                          collocations=False, # 単語の重複しないように
+def create_wordcrowd(text, width, height,font_path):
+    wordcloud = WordCloud(background_color="white"
+                          ,width=width  #800だった
+                          ,height=height#600だった
+                          ,collocations=False # 単語の重複しないように
+                          ,font_path=font_path
                          ).generate( text )
     wordcloud_svg = wordcloud.to_svg()
     file_name = None
-    f = open("/src/static/wordcloud/wordcloud.svg","w+")
+    f = open("/src/static/wordcloud/wordcloud.svg","w+", encoding="utf_8")
     file_name = f.name
     f.write(wordcloud_svg)
     f.close()

@@ -3,6 +3,11 @@ FROM ubuntu:21.04
 RUN apt-get update -y && apt-get upgrade -y
 RUN apt-get install -y wget build-essential gcc zlib1g-dev
 
+# langage JP
+RUN apt-get install -y locales \
+    && locale-gen ja_JP.UTF-8 \
+    && echo "export LANG=ja_JP.UTF-8" >> ~/.bashrc
+
 # latest openssl for python
 WORKDIR /root/
 RUN wget https://www.openssl.org/source/openssl-1.1.1d.tar.gz \
