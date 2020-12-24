@@ -12,23 +12,6 @@ from wordcloud import WordCloud, ImageColorGenerator
 #fpath = "C:\Windows\Fonts\meiryob.ttc" # fontは任意で
 app = Flask(__name__)
 app.secret_key = os.urandom(16)
-def get_wordcrowd( text ):
-    wordcloud = WordCloud(background_color="white",
-                          width=800,
-                          height=600,
-                          #font_path=fpath,
-                          collocations=False, # 単語の重複しないように
-                         ).generate( text )
-    wordcloud.to_file("wordcloud.png")
-    wordcloud_svg = wordcloud.to_svg()
-    f = open("/src/static/word_cloud/word_cloud.svg","w+")
-    f.write(wordcloud_svg )
-    f.close()
-    #svg_document = svgwrite.Drawing(filename = "test-svgwrite.svg",profile = 'full')
-    #svg_document.add(svg_document.text(wordcloud,
-    #                                        insert = (210, 110)))
-    #svg_document.tostring()
-    #svg_document.save()
 
 # データベースコネクション情報
 MYSQL_OPTIONS = {"host": 'db'
@@ -50,56 +33,67 @@ def index():
     return render_template("index.html")
 
 # ホーム
-@app.route('/create_word_cloud', methods=["GET", "POST"])
-def create_word_cloud():
-    SESSION_KEY_WORD_LIST = 'word_list'
+@app.route('/create_wordcloud', methods=["GET", "POST"])
+def create_wordcloud():
+    file_name = ""
     input_sentence = ""
-    if SESSION_KEY_WORD_LIST in session:
-        word_list = session[SESSION_KEY_WORD_LIST]
     if request.method == "POST":
         input_sentence = request.form["input_sentence"]
-        word_list = list()
-        #特定の品詞の単語を抽出
-        mecab = MeCab.Tagger("-o chasen")
-        mecab.parse('')
-        node = mecab.parseToNode(input_sentence)
-        words = list()
-        while node:
-            if node.feature.split(",")[0] == "名詞":
-                word = node.surface
-                words.append(word)
-                #print("名詞=>" + word)
-            elif node.feature.split(",")[0] == "動詞":
-                word = node.surface
-                words.append(word)
-                #print("動詞=>" + word)
-            elif node.feature.split(",")[0] == "形容詞":
-                word = node.surface
-                words.append(word)
-                #print("形容詞=>" + word)
-            elif node.feature.split(",")[0] == "形容動詞":
-                word = node.surface
-                words.append(word)
-                #print("形容動詞=>" + word)
-            else:
-                pass
-            node = node.next
-        word_counter = collections.Counter(words)
-        for key in word_counter.keys():
-            word_list.append({"word":key
-                             ,"count":str(word_counter[key])
-                             ,"size":str(word_counter[key]*len(word_list)/5)
-                             ,"color":color_list[random.randrange(len(color_list))]
-                             })
-
-        session[SESSION_KEY_WORD_LIST] = word_list
-
+        wordcloud_width = request.form["wordcloud_width"]
+        words = get_words_for_mecab(input_sentence)
         # ファイル作成
-        get_wordcrowd(input_sentence)
+        file_name = create_wordcrowd(" ".join(words), int(wordcloud_width), int(wordcloud_width)//2)
+
     return render_template("index.html"
-                          ,word_list=word_list
                           ,input_sentence=input_sentence
+                          ,file_name=file_name
+                          ,wordcloud_width=wordcloud_width
                           )
+
+def create_wordcrowd(text, width, height):
+    wordcloud = WordCloud(background_color="white",
+                          width=width,  #800だった
+                          height=height,#600だった
+                          collocations=False, # 単語の重複しないように
+                         ).generate( text )
+    wordcloud_svg = wordcloud.to_svg()
+    file_name = None
+    f = open("/src/static/wordcloud/wordcloud.svg","w+")
+    file_name = f.name
+    f.write(wordcloud_svg)
+    f.close()
+
+    return file_name
+
+#入力された文章を単語分けして返却(MeCab使用)
+def get_words_for_mecab(sentence):
+    word_list = list()
+    #特定の品詞の単語を抽出
+    mecab = MeCab.Tagger("-o chasen")
+    mecab.parse('')
+    node = mecab.parseToNode(sentence)
+    words = list()
+    while node:
+        if node.feature.split(",")[0] == "名詞":
+            word = node.surface
+            words.append(word)
+            #print("名詞=>" + word)
+        elif node.feature.split(",")[0] == "動詞":
+            word = node.surface
+            words.append(word)
+            #print("動詞=>" + word)
+        elif node.feature.split(",")[0] == "形容詞":
+            word = node.surface
+            words.append(word)
+            #print("形容詞=>" + word)
+        elif node.feature.split(",")[0] == "形容動詞":
+            word = node.surface
+            words.append(word)
+            #print("形容動詞=>" + word)
+        else:
+            pass
+        node = node.next
+    return words
 
 # データベースコネクション取得
 def getConnection():

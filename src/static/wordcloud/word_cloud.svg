@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600">
+<style>text{font-family:'Droid Sans Mono';font-weight:normal;font-style:normal;}</style>
+<rect width="100%" height="100%" style="fill:white"></rect>
+<text transform="translate(522,150)" font-size="316" style="fill:rgb(99, 203, 95)">_</text>
+<text transform="translate(20,473)" font-size="237" style="fill:rgb(129, 211, 77)">input</text>
+<text transform="translate(4,125)" font-size="165" style="fill:rgb(40, 125, 142)">sentence</text>
+<text transform="translate(2,216)" font-size="122" style="fill:rgb(70, 48, 126)">request</text>
+<text transform="translate(402,570)" font-size="122" style="fill:rgb(32, 164, 134)">words</text>
+<text transform="translate(245,310)" font-size="92" style="fill:rgb(44, 177, 126)">method</text>
+<text transform="translate(16,557)" font-size="92" style="fill:rgb(65, 66, 135)">POST</text>
+<text transform="translate(578,274)" font-size="92" style="fill:rgb(68, 191, 112)">form</text>
+<text transform="translate(2,274)" font-size="65" style="fill:rgb(40, 125, 142)">mecab</text>
+</svg>
