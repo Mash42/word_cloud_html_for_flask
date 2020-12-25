@@ -10,7 +10,6 @@ import os
 import datetime
 #ワードクラウド
 from wordcloud import WordCloud, ImageColorGenerator
-#fpath = "C:\Windows\Fonts\meiryob.ttc" # fontは任意で
 app = Flask(__name__)
 app.secret_key = os.urandom(16)
 
@@ -47,8 +46,17 @@ def create_wordcloud():
         input_sentence = request.form["input_sentence"]
         wordcloud_width = request.form["wordcloud_width"]
         words = get_words_for_mecab(input_sentence)
+        #日本語だけに絞る
+        japanane_words = list()
+        for word in words:
+            # ワードが英数字ではない場合
+            if not isalnum(word):
+                if len(word) > 1:
+                    japanane_words.append(word)
+                #if word not in ["匿名","質問","募集","し","ー","てる","中","て","それ","いい","する","さん","そう","これ","なっ","_________"] and len(word) > 1:
+                #    japanane_words.append(word)
         # ファイル作成
-        file_name = create_wordcrowd(" ".join(words)
+        file_name = create_wordcrowd(" ".join(japanane_words)
                                     ,int(wordcloud_width)
                                     ,int(wordcloud_width)//2
                                     ,WORDCLOUD_FONT_PATH)
@@ -59,11 +67,11 @@ def create_wordcloud():
                           ,wordcloud_width=wordcloud_width
                           ,new_time=new_time
                           )
-
-def create_wordcrowd(text, width, height,font_path):
-    wordcloud = WordCloud(background_color="white"
-                          ,width=width  #800だった
-                          ,height=height#600だった
+# ワードクラウド作成
+def create_wordcrowd(text, width, height, font_path):
+    wordcloud = WordCloud(background_color="black"
+                          ,width=width
+                          ,height=height
                           ,collocations=False # 単語の重複しないように
                           ,font_path=font_path
                          ).generate( text )
@@ -117,7 +125,10 @@ def getConnection():
                           ,cursorclass=pymysql.cursors.DictCursor
                           )
     return conn
-
+#半角英数字
+alnumReg = re.compile(r'^[a-zA-Z0-9]+$')
+def isalnum(s):
+    return alnumReg.match(s) is not None
 # アプリ起動
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
