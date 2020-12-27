@@ -50,22 +50,28 @@ def create_wordcloud():
         japanane_words = list()
         for word in words:
             # ワードが英数字ではない場合
-            if not isalnum(word):
-                if len(word) > 1:
-                    japanane_words.append(word)
-                #if word not in ["匿名","質問","募集","し","ー","てる","中","て","それ","いい","する","さん","そう","これ","なっ","_________"] and len(word) > 1:
-                #    japanane_words.append(word)
+            if not isalnum(word) and len(word) > 1 and not "://" in word and not "_________" in word:
+                japanane_words.append(word)
         # ファイル作成
         file_name = create_wordcrowd(" ".join(japanane_words)
                                     ,int(wordcloud_width)
                                     ,int(wordcloud_width)//2
                                     ,WORDCLOUD_FONT_PATH)
-
+        # ワード出現回数のカウント
+        word_count_dict = collections.Counter(japanane_words)
+        word_count_list = list()
+        for key in word_count_dict:
+            word_count_list.append({"word":key
+                                   ,"count":word_count_dict[key]
+                                   })
+        word_count_list = sorted(word_count_list, key=lambda x:x['count'], reverse=True)[:10]
+        #print(word_count_list)
     return render_template("index.html"
                           ,input_sentence=input_sentence
                           ,file_name=file_name
                           ,wordcloud_width=wordcloud_width
                           ,new_time=new_time
+                          ,word_count_list=word_count_list
                           )
 # ワードクラウド作成
 def create_wordcrowd(text, width, height, font_path):
@@ -113,7 +119,6 @@ def get_words_for_mecab(sentence):
             pass
         node = node.next
     return words
-
 # データベースコネクション取得
 def getConnection():
     conn = pymysql.connect(host=MYSQL_OPTIONS['host']

@@ -53,7 +53,7 @@
         <title>ワードクラウド</title>
     </head>
     <body>
-        <div class="container mt-1" id="app">
+        <div class="container-fluid mt-1" id="app">
             <div class="row">
                 <div class="col-6">
                     <form action="/create_wordcloud" 
@@ -80,10 +80,29 @@
                         </object>                   
                     </div>
                 </div>
-                <div class="col-6">
-                    
+                <div class="col-6 mt-2">
+                    <div id="chart" class="w-100 h-100"></div>
                 </div>
             </div>
         </div>
+        <script>
+            {% if word_count_list %}
+
+            var chart = c3.generate({
+                data: {
+                    // iris data from R
+                    columns: [
+                    {% for data in word_count_list %}
+                        ["{{data['word']}}", "{{data['count']}}"],
+                    {% endfor %}
+                    ],
+                    type : 'pie'
+                    //onclick: function (d, i) { console.log("onclick", d, i); },
+                    //onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+                    //onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+                }
+            });
+            {% endif %}
+        </script>
     </body>
 </html>
